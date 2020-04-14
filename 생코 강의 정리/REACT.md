@@ -277,3 +277,74 @@ export default Toc;
 ```
 import Toc from "./components/TOC"
 ```
+
+# State
+
+props - 사용자에게 컴포넌트를 조작 가능하게 만듬
+
+state - 사용자가 알 필요 없는 컴포넌트 내부의 내용
+
+그래서 App.js는 TOC와 같은 Component가 어떻게 동작하는 지 알 필요가 없어진다.
+
+코드로 적용을 하자면 지금까지의 우리 코드는 하드코딩이 되어있었다. props를 이용했다고 하더라도 props 속성을 하드코딩을 하여 줬다.
+
+```
+class App extends Component {
+  render() {
+    return (
+      <div className="App">
+        <Subject title="WEB" sub="world wide web!"></Subject>
+        <TOC></TOC>
+        <Content title="HTML" desc="HTML is HyperText Markup Language."></Subject>
+      </div>
+    );
+  }
+}
+```
+
+이를 State를 이용해서 변경해 보겠다.
+
+### Constructor
+
+Constructor는 컴포넌트 실행시 제일 먼저 실행되는 것으로 주로 초기화를 담당한다.
+우리는 각 컴포넌트가 그려지기 전에 props에 값을 추려하므로 이를 이용해 props 값을 초기화 한다.
+
+```
+class App extends Component {
+  constructor(props){
+    super(props);
+    // state 초기화
+    this.state = {
+      subject: {title:'WEB', sub:'World Wide Web!'},
+      contents:[
+        {id:1, title:'HTML', desc:'HTML is for information'},
+        {id:2, title:'CSS', desc:'CSS is for design'},
+        {id:3, title:'JavaScript', desc:'JavaScript is for interactive'}
+      ]
+    }
+  }
+  render() {
+    return (
+      <div className="App">
+        <Subject title="WEB" sub="world wide web!"></Subject>
+        <TOC></TOC>
+        <Content title="HTML" desc="HTML is HyperText Markup Language."></Subject>
+      </div>
+    );
+  }
+}
+```
+
+그 후에 이를 이용해서 props 값을 state 값으로 주려면 아래와 같이 하면 된다.
+
+```
+render() {
+  return (
+    <div className="App">
+      <Subject title={this.state.subject.title} sub={this.state.subject.sub}></Subject>
+      <TOC data={this.state.contents}></TOC>
+      <Content title="HTML" desc = "HTML is HYperText Markup Language"></Content>
+    </div>
+  );
+}
+```
