@@ -274,48 +274,36 @@ export default Toc;
 
 그 이후엔 App.js의 Toc 코드를 지우고 TOC.js의 코드를 사용하기 위해 import 해준다.
 
+
 ```
 import Toc from "./components/TOC"
 ```
 
-# State
+# 이벤트
 
-props - 사용자에게 컴포넌트를 조작 가능하게 만듬
+## 이벤트 state props 그리고 render 함수
 
-state - 사용자가 알 필요 없는 컴포넌트 내부의 내용
+이제 우리는 이벤트를 이용하여 제목에 링크를 걸고 그에 따라 보이는 title과 desc의 값을 다르게 할 것이다.
+우선 그전에 우리는 render() 함수에 대해 알아야 한다.
 
-그래서 App.js는 TOC와 같은 Component가 어떻게 동작하는 지 알 필요가 없어진다.
+## render()
 
-코드로 적용을 하자면 지금까지의 우리 코드는 하드코딩이 되어있었다. props를 이용했다고 하더라도 props 속성을 하드코딩을 하여 줬다.
+render() 함수가 하는 일은 어떤 html을 그릴 것인지 결정하고 다시 그리는 것이다. 
+따라서 props나 state가 바뀌면 React는 render()함수를 재 호출한다.
 
-```
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <Subject title="WEB" sub="world wide web!"></Subject>
-        <TOC></TOC>
-        <Content title="HTML" desc="HTML is HyperText Markup Language."></Subject>
-      </div>
-    );
-  }
-}
-```
+따라서 state에 값을 주고 그 값이 변하게 되면 render()함수가 호출이 되어 html이 로드 되고 화면이 변하게 된다.
 
-이를 State를 이용해서 변경해 보겠다.
-
-### Constructor
-
-Constructor는 컴포넌트 실행시 제일 먼저 실행되는 것으로 주로 초기화를 담당한다.
-우리는 각 컴포넌트가 그려지기 전에 props에 값을 추려하므로 이를 이용해 props 값을 초기화 한다.
+App.js의 constructor의 state에 mode를 추가하고 초기값을 'welcome'으로 설정해두고 render()함수 호출 전에 state의 값에 따라 그릴 props의 값을 변화한다.
 
 ```
 class App extends Component {
+  // Component 실행 시 제일 먼저 실행 (주로 초기화 담당)
   constructor(props){
     super(props);
-    // state 초기화
     this.state = {
-      subject: {title:'WEB', sub:'World Wide Web!'},
+      mode: 'welcome',
+      subject:{title:'WEB', sub:'World Wide Web!'},
+      welcome:{title:'Welcome', desc:'Hello,React!!'},
       contents:[
         {id:1, title:'HTML', desc:'HTML is for information'},
         {id:2, title:'CSS', desc:'CSS is for design'},
@@ -324,27 +312,25 @@ class App extends Component {
     }
   }
   render() {
+    var _title, _desc = null;
+    if(this.state.mode === 'welcome'){
+      _title = this.state.welcome.title;
+      _desc = this. state.welcome.desc;
+    } else if(this.state.mode === 'read'){
+      _title = this.state.contents[0].title;
+      _desc = this.state.contents[0].desc;
+    }
     return (
       <div className="App">
-        <Subject title="WEB" sub="world wide web!"></Subject>
-        <TOC></TOC>
-        <Content title="HTML" desc="HTML is HyperText Markup Language."></Subject>
+        <Subject title={this.state.subject.title} sub={this.state.subject.sub}></Subject>
+        <TOC data={this.state.contents}></TOC>
+        <Content title={_title} desc = {_desc}></Content>
       </div>
     );
   }
 }
 ```
 
-그 후에 이를 이용해서 props 값을 state 값으로 주려면 아래와 같이 하면 된다.
+이렇게 하면 mode의 값에 따라 화면에 보이는 값이 달라진다.
 
-```
-render() {
-  return (
-    <div className="App">
-      <Subject title={this.state.subject.title} sub={this.state.subject.sub}></Subject>
-      <TOC data={this.state.contents}></TOC>
-      <Content title="HTML" desc = "HTML is HYperText Markup Language"></Content>
-    </div>
-  );
-}
-```
+또한, console.log를 통하여 mode state값이 변했을 때 render가 재 호출 되는 것을 확인할 수 있다.
